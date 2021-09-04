@@ -13,13 +13,14 @@ from dataset import dataset
 torch.manual_seed(1)  # 最后的路径正确，但是分值无法稳定复现，原因不明
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 START_TAG, END_TAG = "<START>", "<END>"
-tag2ix = {"B-PER": 0, "I-PER": 1,
-                  "B-LOC": 2, "I-LOC": 3,
-                  "B-ORG": 4, "I-ORG": 5, "O": 6, START_TAG: 7, END_TAG: 8}
+# tag2ix = {"B-PER": 0, "I-PER": 1,
+#                   "B-LOC": 2, "I-LOC": 3,
+#                   "B-ORG": 4, "I-ORG": 5, "O": 6, START_TAG: 7, END_TAG: 8}
+tag2ix={"s": 0, "B": 1, "M": 2,"E":3,START_TAG: 4, END_TAG: 5}
 ix2tag = {v:k for k,v in tag2ix.items()}
-batch_size = 512
+batch_size = 3
 max_seq_length = 100
-epochs = 100
+epochs = 5
 interval_save = 1
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -110,8 +111,8 @@ class BiLSTM_CRF(nn.Module):
         #把循环变成了gather
         score = torch.zeros(bt).to(device)
         for i, frame in enumerate(frames):  # 沿途累加每一帧的转移和发射 #[128,9]
-            score += self.transitions[tags_tensor[i], tags_tensor[i + 1]] + frame[range(bt), tags_tensor[i + 1]]
-        return score + self.transitions[tags_tensor[-1], self.tag2ix[END_TAG]]  # 加上到END_TAG的转移
+            score += self.transitions[tags_tensor[i].type(torch.int64), tags_tensor[i + 1].type(torch.int64)] + frame[range(bt), tags_tensor[i + 1].type(torch.int64)]
+        return score + self.transitions[tags_tensor[-1].type(torch.int64), self.tag2ix[END_TAG]]  # 加上到END_TAG的转移
 
     def _forward_alg(self, frames):
         """ 给定每一帧的发射分值; 按照当前的CRF层参数算出所有可能序列的分值和，用作概率归一化分母 """

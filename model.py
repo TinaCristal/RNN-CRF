@@ -23,8 +23,8 @@ class BiLSTM_CRF(nn.Module):
         self.transitions = nn.Parameter(torch.randn(self.target_size, self.target_size).to(self.device),
                                         requires_grad=True)
         # 开始和结束的转移限制
-        self.transitions.data[pos2id['STOP'], :] = -10000
-        self.transitions.data[:, pos2id['START']] = -10000
+        # self.transitions.data[pos2id['STOP'], :] = -10000
+        # self.transitions.data[:, pos2id['START']] = -10000
 
     # 计算所有路径的得分
     def _forward_alg(self, feats):  # feats:shape(batch_size, seq_length, target_size)
@@ -54,7 +54,7 @@ class BiLSTM_CRF(nn.Module):
         start = torch.tensor(self.pos2id['START']).unsqueeze(-1).repeat(len(feats), 1).to(
             self.device)  # shape(# batch_size, 1)
         tags_new = torch.cat((start, tags), dim=-1)  # shape(batch_size, seq_length + 1)
-        feats_all = torch.gather(feats, dim=-1, index=tags.unsqueeze(-1)).sum(dim=1).sum()
+        feats_all = torch.gather(feats, dim=-1, index=tags.unsqueeze(-1).type(torch.int64)).sum(dim=1).sum()
         transition_all = self.transitions[tags_new[:, :-1].flatten(), tags_new[:, 1:].flatten()].sum()
         score = score + transition_all + feats_all
         stop = torch.full((len(feats),), self.pos2id['STOP'], dtype=torch.long)

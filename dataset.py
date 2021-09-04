@@ -3,18 +3,19 @@ import numpy as np
 from torch.utils.data import Dataset
 
 START_TAG, END_TAG = "<START>", "<END>"
-tag2ix = {"B-PER": 0, "I-PER": 1,
-                  "B-LOC": 2, "I-LOC": 3,
-                  "B-ORG": 4, "I-ORG": 5, "O": 6, START_TAG: 7, END_TAG: 8}
+# tag2ix = {"B-PER": 0, "I-PER": 1,
+#                   "B-LOC": 2, "I-LOC": 3,
+#                   "B-ORG": 4, "I-ORG": 5, "O": 6, START_TAG: 7, END_TAG: 8}
+tag2ix={"s": 0, "B": 1, "M": 2,"E":3,START_TAG: 4, END_TAG: 5}
 ix2tag = {v:k for k,v in tag2ix.items()}
 
 
 class dataset(Dataset):
     def __init__(self,seq_length,mode):
-        train_corpus_path = './data/train_corpus.txt'
-        train_label_path = './data/train_label.txt'
-        test_corpus_path = './data/test_corpus.txt'
-        test_label_path = './data/test_label.txt'
+        train_corpus_path = './data/trainCorpus.txt'
+        train_label_path = './data/trainLabel.txt'
+        test_corpus_path = './data/testCorpus.txt'
+        test_label_path = './data/testLabel.txt'
 
         self.length = 0
         self.seq_length = seq_length
@@ -45,8 +46,8 @@ class dataset(Dataset):
         return vocabulary_idx
 
     def __getitem__(self, index):
-        pad_words = ['，']
-        pad_label = ['O']
+        pad_words = [',']
+        pad_label = ['M']
         words = self.corpus_splt[index]
         sent_length = len(words)
         words = words + pad_words * self.seq_length

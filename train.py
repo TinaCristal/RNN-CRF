@@ -1,23 +1,22 @@
 import os
+
 import torch
-import torch.nn as nn
 import torch.optim as optim
-from  torch.utils.data import DataLoader
-from tqdm import tqdm
+from seqeval.metrics import accuracy_score
 from seqeval.metrics import f1_score
 from seqeval.metrics import precision_score
-from seqeval.metrics import accuracy_score
 from seqeval.metrics import recall_score
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+
+from config import *
 from dataset import dataset
 from model import BiLSTM_CRF
-from config import *
 
 torch.manual_seed(1)  # 最后的路径正确，但是分值无法稳定复现，原因不明
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-tag2ix = {"B-PER": 0, "I-PER": 1,
-                  "B-LOC": 2, "I-LOC": 3,
-                  "B-ORG": 4, "I-ORG": 5, "O": 6, 'START': 7, 'STOP': 8}
+tag2ix = {"S": 0, "B": 1,"M": 2, "E": 3}
 ix2tag = {v:k for k,v in tag2ix.items()}
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 

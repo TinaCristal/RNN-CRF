@@ -148,14 +148,19 @@ class BiLSTM_CRF(nn.Module):
 
 
 if __name__ == "__main__":
-    training_data = [("the wall street journal reported today that apple corporation made money".split(),
-                      "B I I I O O O B I O O".split()),
-                     ("georgia tech is a university in georgia".split(), "B I O O O O B".split())]
+    # training_data = [("the wall street journal reported today that apple corporation made money".split(),
+    #                   "B I I I O O O B I O O".split()),
+    #                  ("georgia tech is a university in georgia".split(), "B I O O O O B".split())]
 
-    model = BiLSTM_CRF(tag2ix={"B": 0, "I": 1, "O": 2, START_TAG: 3, END_TAG: 4},
+    # model = BiLSTM_CRF(tag2ix={"B": 0, "I": 1, "O": 2, START_TAG: 3, END_TAG: 4},
+    #                    word2ix={w: i for i, w in enumerate({w for s, _ in training_data for w in s})},
+    #                    embedding_dim=5, hidden_dim=4)
+    training_data = [("I a m l a z y".split(),
+                      "s B E B M M E".split()),
+                     ("I a m d i r t y".split(), "s B E B M M M E".split())]
+    model = BiLSTM_CRF(tag2ix={"s": 0, "B": 1, "M": 2,"E":3,START_TAG: 4, END_TAG: 5},
                        word2ix={w: i for i, w in enumerate({w for s, _ in training_data for w in s})},
                        embedding_dim=5, hidden_dim=4)
-
     # with torch.no_grad():  # 训练前, 观察一下预测结果(应该是随机或者全零参数导致的结果)
     #     print(model(training_data[0][0]))
 
